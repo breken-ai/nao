@@ -41,6 +41,7 @@ export interface UserGroupEditorGroup {
 	id: string;
 	name: string;
 	isDefault: boolean;
+	isLocked?: false;
 	featureGrants: UserGroupFeature[];
 	toolCallDensityPolicy: ToolCallDensityPolicy;
 	databaseAccess: DatabaseContextAccess;
