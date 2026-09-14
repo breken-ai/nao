@@ -164,6 +164,9 @@ function splitStatements(sql: string): string[] {
 /**
  * For `WITH ... AS (...) <operation>` statements, skip past all CTE
  * definitions (balanced parentheses) and return the main operation keyword.
+ * A CTE may declare a column list before its body (`name(col, ...) AS (...)`);
+ * that parenthesised group is followed by `AS`, so it is skipped rather than
+ * mistaken for the body.
  */
 function getWithMainKeyword(sql: string): string | null {
 	let pos = sql.search(/\bWITH\b/i);
@@ -201,6 +204,10 @@ function getWithMainKeyword(sql: string): string | null {
 				const rest = sql.slice(pos + 1).trimStart();
 				if (rest.startsWith(',')) {
 					pos = sql.indexOf(',', pos + 1) + 1;
+					continue;
+				}
+				if (/^AS\b/i.test(rest)) {
+					pos++;
 					continue;
 				}
 				const match = rest.match(/^(\w+)/);

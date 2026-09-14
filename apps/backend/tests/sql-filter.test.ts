@@ -25,6 +25,32 @@ describe('isReadOnlySqlQuery', () => {
 		expect(await isReadOnlySqlQuery('WITH cte AS (SELECT id FROM users) SELECT * FROM cte')).toBe(true);
 	});
 
+	it('allows a WITH (CTE) SELECT whose CTE declares a column list', async () => {
+		expect(await isReadOnlySqlQuery('WITH cte(id, name) AS (SELECT id, name FROM users) SELECT * FROM cte')).toBe(
+			true,
+		);
+	});
+
+	it('allows a recursive CTE with a column list', async () => {
+		expect(
+			await isReadOnlySqlQuery(
+				'WITH RECURSIVE t(n) AS (VALUES (1) UNION ALL SELECT n + 1 FROM t WHERE n < 10) SELECT sum(n) FROM t',
+			),
+		).toBe(true);
+	});
+
+	it('allows several CTEs when a later one declares a column list', async () => {
+		expect(await isReadOnlySqlQuery('WITH a AS (SELECT 1), b(x) AS (SELECT 2) SELECT * FROM a, b')).toBe(true);
+	});
+
+	it('blocks a write behind a CTE with a column list', async () => {
+		expect(
+			await isReadOnlySqlQuery(
+				'WITH cte(id) AS (SELECT id FROM users) DELETE FROM users WHERE id IN (SELECT id FROM cte)',
+			),
+		).toBe(false);
+	});
+
 	it('blocks INSERT', async () => {
 		expect(await isReadOnlySqlQuery("INSERT INTO users (name) VALUES ('alice')")).toBe(false);
 	});
