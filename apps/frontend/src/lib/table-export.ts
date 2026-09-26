@@ -6,7 +6,10 @@ import { triggerDownload } from '@/lib/download';
 
 type TableRow = Record<string, unknown>;
 
-const neutralizeFormula = (value: string) => (/^[=+\-@\t\r]/.test(value) ? `'${value}` : value);
+const isPlainNumber = (value: string) => /^-?\d+(\.\d+)?(e[+-]?\d+)?$/i.test(value);
+
+const neutralizeFormula = (value: string) =>
+	/^[=+\-@\t\r]/.test(value) && !isPlainNumber(value) ? `'${value}` : value;
 
 const escapeCsvCell = (value: string) => {
 	const safe = neutralizeFormula(value);

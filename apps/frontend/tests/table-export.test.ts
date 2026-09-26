@@ -26,11 +26,26 @@ describe('tableToCsv', () => {
 			'day,label\n"March 15, 2024",launch',
 		);
 	});
+
+	it('keeps negative numbers as numbers while still neutralizing formulas', () => {
+		const signedRows = [
+			{ delta: -5, ratio: -0.25, amount: '-12.50', note: '-2+3' },
+			{ delta: 3, ratio: 0.5, amount: '7', note: '=SUM(A1:A2)' },
+		];
+		expect(tableToCsv(['delta', 'ratio', 'amount', 'note'], signedRows, null)).toBe(
+			"delta,ratio,amount,note\n-5,-0.25,-12.50,'-2+3\n3,0.5,7,'=SUM(A1:A2)",
+		);
+	});
 });
 
 describe('tableToTsv', () => {
 	it('formats ISO dates with the provided date format settings', () => {
 		expect(tableToTsv(columns, rows, { preset: 'american' })).toBe('day\tlabel\n03/15/2024\tlaunch');
+	});
+
+	it('keeps negative numbers as numbers while still neutralizing formulas', () => {
+		const signedRows = [{ delta: -5, note: '@cmd' }];
+		expect(tableToTsv(['delta', 'note'], signedRows, null)).toBe("delta\tnote\n-5\t'@cmd");
 	});
 });
 
