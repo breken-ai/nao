@@ -31,9 +31,10 @@ describe('tableToCsv', () => {
 		const signedRows = [
 			{ delta: -5, ratio: -0.25, amount: '-12.50', note: '-2+3' },
 			{ delta: 3, ratio: 0.5, amount: '7', note: '=SUM(A1:A2)' },
+			{ delta: -1, ratio: -1, amount: '-5e-3', note: '+5' },
 		];
 		expect(tableToCsv(['delta', 'ratio', 'amount', 'note'], signedRows, null)).toBe(
-			"delta,ratio,amount,note\n-5,-0.25,-12.50,'-2+3\n3,0.5,7,'=SUM(A1:A2)",
+			"delta,ratio,amount,note\n-5,-0.25,-12.50,'-2+3\n3,0.5,7,'=SUM(A1:A2)\n-1,-1,-5e-3,'+5",
 		);
 	});
 });
