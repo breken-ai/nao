@@ -1,4 +1,4 @@
-import { buildStoryChartBlock } from '@nao/shared';
+import { buildStoryChartBlock, buildStoryMapBlock, buildStoryTableBlock } from '@nao/shared';
 import { describe, expect, it } from 'vitest';
 
 import { extractStorySummary } from '../src/utils/story-summary';
@@ -56,6 +56,22 @@ Body text
 
 		expect(extractStorySummary(chart).segments).toEqual([
 			{ type: 'chart', chartType: 'kpi_card', title: 'Top "hero" products', kpiCount: 2 },
+		]);
+	});
+
+	it('reads table and map titles that contain escaped quotes', () => {
+		const table = buildStoryTableBlock({ query_id: 'q', title: 'Orders "late"' });
+		const map = buildStoryMapBlock({
+			query_id: 'q',
+			map_type: 'points',
+			latitude_key: 'lat',
+			longitude_key: 'lng',
+			title: "Stores' reach",
+		});
+
+		expect(extractStorySummary(`${table}\n\n${map}`).segments).toEqual([
+			{ type: 'table', title: 'Orders "late"' },
+			{ type: 'map', mapType: 'points', title: "Stores' reach" },
 		]);
 	});
 
